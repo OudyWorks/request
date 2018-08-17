@@ -2,6 +2,7 @@
 
 var http = require('http')
 var https = require('https')
+var http2 = require('http2')
 var url = require('url')
 var util = require('util')
 var stream = require('stream')
@@ -449,7 +450,7 @@ Request.prototype.init = function (options) {
   }
 
   var protocol = self.proxy && !self.tunnel ? self.proxy.protocol : self.uri.protocol
-  var defaultModules = {'http:': http, 'https:': https}
+  var defaultModules = {'http:': http, 'https:': http2}
   var httpModules = self.httpModules || {}
 
   self.httpModule = httpModules[protocol] || defaultModules[protocol]
@@ -944,7 +945,7 @@ Request.prototype.onRequestResponse = function (response) {
   response.toJSON = responseToJSON
 
   // XXX This is different on 0.10, because SSL is strict by default
-  if (self.httpModule === https &&
+  if (self.httpModule === http2 &&
     self.strictSSL && (!response.hasOwnProperty('socket') ||
     !response.socket.authorized)) {
     debug('strict ssl error', self.uri.href)
